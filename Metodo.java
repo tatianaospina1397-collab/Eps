@@ -6,24 +6,62 @@ import java.util.Stack;
 
 public class Metodo {
 
-    public ObjEps[] LLenarArreglo(ObjEps[] m, Scanner sc ){
-        for (int i = 0; i < m.length; i++) {
-            ObjEps o = new ObjEps();
+    public ObjEps[] LLenarArreglo(
+        ObjEps[] pacientes,
+        Scanner sc) {
 
-            System.out.println("Ingrese el Id ");
-            o.setId(sc.nextInt());
-            System.out.println("Ingrese el nombre del Paciente");
-            o.setNombre(sc.next());
-            System.out.println("Ingrese  la edad del paciente");
-            o.setEdad(sc.nextInt());
-            System.out.println("Ingre el servicio");
-            o.setServicio(sc.next());
-            o.setEstado("Pendiente");
+    int posicion = 0;
+    int continuar = 1;
 
-            m[i] = o;
+    while (continuar == 1) {
+
+        
+        if (posicion == pacientes.length) {
+
+            ObjEps[] nuevo =
+                    new ObjEps[pacientes.length + 1];
+
+            for (int i = 0; i < pacientes.length; i++) {
+
+                nuevo[i] = pacientes[i];
+            }
+
+            pacientes = nuevo;
         }
-        return m;
+
+        ObjEps o = new ObjEps();
+
+        System.out.println("\n===== REGISTRAR PACIENTE =====");
+
+        System.out.println("Ingrese el ID del paciente");
+        o.setId(sc.nextInt());
+
+        System.out.println("Ingrese el nombre del paciente");
+        o.setNombre(sc.next());
+
+        System.out.println("Ingrese la edad del paciente");
+        o.setEdad(sc.nextInt());
+
+        System.out.println("Ingrese el servicio");
+        o.setServicio(sc.next());
+
+        o.setEstado("Pendiente");
+
+        pacientes[posicion] = o;
+
+        posicion++;
+
+        System.out.println("\nPaciente registrado correctamente");
+
+        System.out.println("\n¿Desea ingresar otro paciente?");
+        System.out.println("1) Si");
+        System.out.println("2) No");
+
+        continuar = sc.nextInt();
     }
+
+    return pacientes;
+}
 
     public ObjEps[] MostrarArreglo(ObjEps[] m){
         for (int i = 0; i < m.length; i++) {
@@ -113,10 +151,11 @@ public class Metodo {
         return colaCancelada;
     }
 
-    public ObjEps CambiarSevicio(ObjEps[] paciente, Scanner sc){
+    public ObjEps CambiarSevicio(ObjEps[] pacientes, Scanner sc){
+        
         System.out.println("Ingrese el Id del paciente");
         int id = sc.nextInt();
-        ObjEps o = BuscarPaciente(paciente,id);
+        ObjEps o = BuscarPaciente(pacientes,id);
         if(o != null){
             System.out.println("Servicio actual es: "+ o.getServicio());
             System.out.println("Ingrese el nuevo servicio");
@@ -180,9 +219,109 @@ public class Metodo {
         return colasAtendidos;
 
     }
-    
-    
 
 
+     public Stack<ObjEps> SolicitarAtencion(Stack<ObjEps> pilaPendiente, ObjEps[] pacientes, Scanner sc){
+        System.out.println("Ingrese el Id del pacienre");
+        int id = sc.nextInt();   
+        ObjEps o = BuscarPaciente(pacientes, id);
+        if(o!= null){
+            if (o.getEstado().equals("Cancelado") || o.getEstado().equals("Retirado")) {
+                o.setEstado("Pendiente");
+                pilaPendiente.push(o);
+                System.out.println("Paciente volvio solicitar atencion");
+
+                
+            }else{
+                System.out.println("No se puede solicitar atencion");
+            }
+        } 
+        else{
+            System.out.println("Paciente no fue econtrado"  );
+
+        }
+        return pilaPendiente;
+    }
+
+    public ObjEps MostrarPacientes(ObjEps o){
+        System.out.println("id"+ o.getId() + "Nombre" + o.getNombre() + "Edad" + o.getEdad() + "Servicio" + o.getServicio() + "Estado" + o.getEstado());
+        return o;
+    }
+
+    public Queue<ObjEps> MostrarColaAtendidos(Queue<ObjEps> colasAtendidos){
+        if(colasAtendidos.isEmpty()){
+            System.out.println("No hay pacientes por atender");
+        }
+         else{
+            for(ObjEps o : colasAtendidos){
+                MostrarPacientes(o);
+
+            }
+         }
+         return colasAtendidos;
+    }
+    public Queue<ObjEps> MostrarColaCancelados(Queue<ObjEps> colaCancelada){
+        if(colaCancelada.isEmpty()){
+            System.out.println("No hay pacientes cancelados");
+        }
+        else{
+            for(ObjEps o : colaCancelada){
+                MostrarPacientes(o);
+            }
+        }
+        return colaCancelada;
+    }
+    public Queue<ObjEps> MostrarColaPrioritarios(Queue<ObjEps> colaPrioritaria){
+        if(colaPrioritaria.isEmpty()){
+            System.out.println("No hay pacientes prioritarios");
+        }
+        else{
+            for(ObjEps o : colaPrioritaria){
+                MostrarPacientes(o);
+            }
+        }
+        return colaPrioritaria;
+    }
+    public ObjEps[] MostrarTodosPacientes(Stack<ObjEps> pilaPendiente, ObjEps[] pacientes,Queue<ObjEps> colaPrioritaria,Queue<ObjEps> colaCancelada,Queue<ObjEps> colasAtendidos){
+        System.out.println("Lista de pacientes");
+        System.out.println("\n=================================");
+        MostrarArreglo(pacientes);
+        MostrarPilaPendientes(pilaPendiente);
+        MostrarColaAtendidos(colasAtendidos);
+        MostrarColaCancelados(colaCancelada);
+        MostrarColaPrioritarios(colaPrioritaria);
+        return pacientes;
+    }
+    public String[] AgregarHistorial(String[] historial, String operacion){
+        int posicion = 0;
+        while (posicion < historial.length && historial[posicion] !=null) {
+            posicion ++;
+        }
+
+        if (posicion < historial.length) { 
+            historial[posicion] = operacion; 
+        }
+        else {
+             String[] nuevo = new String[historial.length + 5]; 
+             for (int i = 0; i < historial.length; i++){ 
+                nuevo[i] = historial[i]; 
+            } 
+                nuevo[historial.length] = operacion; historial = nuevo; 
+            }
+            return historial;
+
+    }
+    public String[] MostrarHistorial( String[] historial) { 
+    boolean hayOperaciones = false; 
+    for (int i = 0; i < historial.length; i++) { 
+        if (historial[i] != null) { 
+            System.out.println( (i + 1) + ") " + historial[i] ); hayOperaciones = true; 
+        } 
+    } 
+    if (!hayOperaciones) { System.out.println( "No se han realizado operaciones" ); 
+
+    } 
+    return historial; 
+} 
 
 }
